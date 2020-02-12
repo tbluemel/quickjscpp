@@ -1,0 +1,49 @@
+From 806a656e452b1e45e33fe9fa15a5d7f1b24ec692 Mon Sep 17 00:00:00 2001
+From: Thomas Bluemel <thomas@reactsoft.com>
+Date: Wed, 5 Feb 2020 22:33:53 -0700
+Subject: [PATCH 3/3] Add JS_SetRuntimeOpaque() and JS_GetRuntimeOpaque()
+
+This allows changing and retrieving the opaque pointer attached
+to the runtime
+---
+ quickjs.c | 10 ++++++++++
+ quickjs.h |  2 ++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/quickjs.c b/quickjs.c
+index 40bf101..728e2db 100644
+--- a/quickjs.c
++++ b/quickjs.c
+@@ -1545,6 +1545,16 @@ JSRuntime *JS_NewRuntime2(const JSMallocFunctions *mf, void *opaque)
+     return NULL;
+ }
+ 
++void JS_SetRuntimeOpaque(JSRuntime *rt, void *opaque)
++{
++    rt->malloc_state.opaque = opaque;
++}
++
++void *JS_GetRuntimeOpaque(JSRuntime *rt)
++{
++    return rt->malloc_state.opaque;
++}
++
+ /* default memory allocation functions with memory limitation */
+ static inline size_t js_def_malloc_usable_size(void *ptr)
+ {
+diff --git a/quickjs.h b/quickjs.h
+index aeef197..11aa155 100644
+--- a/quickjs.h
++++ b/quickjs.h
+@@ -335,6 +335,8 @@ void JS_SetRuntimeInfo(JSRuntime *rt, const char *info);
+ void JS_SetMemoryLimit(JSRuntime *rt, size_t limit);
+ void JS_SetGCThreshold(JSRuntime *rt, size_t gc_threshold);
+ JSRuntime *JS_NewRuntime2(const JSMallocFunctions *mf, void *opaque);
++void JS_SetRuntimeOpaque(JSRuntime *rt, void *opaque);
++void *JS_GetRuntimeOpaque(JSRuntime *rt);
+ void JS_FreeRuntime(JSRuntime *rt);
+ typedef void JS_MarkFunc(JSRuntime *rt, JSGCObjectHeader *gp);
+ void JS_MarkValue(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func);
+-- 
+2.20.1
+
