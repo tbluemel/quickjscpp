@@ -84,13 +84,6 @@ public:
 		std::cout << "my_class::fluid_call @ " << (void*)this << ": return myself" << std::endl;
 		return a.get_this();
 	}
-	
-	void gc_mark(quickjs::value::mark_func mark)
-	{
-		std::cout << "my_class::gc_mark @ " << (void*)this << std::endl;
-		// Mark all values this class instance cares about
-		mark(first_arg_);
-	}
 };
 
 quickjs::class_def<my_class> my_class::class_definition = quickjs::runtime::create_class_def<my_class>("my_class", 1,
@@ -224,9 +217,9 @@ public:
 	void gc_mark(quickjs::value::mark_func mark)
 	{
 		std::cout << "my_class_shared::gc_mark @ " << (void*)this << std::endl;
-		// Mark all values this class instance cares about
-		mark(first_arg_);
-		mark(written_val_);
+		// Mark all raw JSValue this class instance might care about.
+		// This is not typically needed, as all quickjs::value objects
+		// are automatically accounted for.
 	}
 	
 	bool check_valid() const

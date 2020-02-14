@@ -582,8 +582,33 @@ namespace quickjs
 			template <typename ClassType>
 			static JSValue ctor(JSContext *ctx, JSValueConst new_target, int argc, JSValueConst *argv);
 			
+			template <typename...>
+			using void_t = void;
+			
+			template <typename, typename = void>
+			struct has_gc_mark: std::false_type{};
+			
+			template <typename C>
+			struct has_gc_mark<C, void_t<decltype(&C::gc_mark)>>: std::is_same<void, decltype(std::declval<C>().gc_mark(nullptr))>{};
+			/*
 			template <typename ClassType>
+			class has_gc_mark
+			{
+				template <typename C>
+				static std::true_type test(decltype(&C::gc_mark));
+				template <typename C>
+				static std::false_type test(...);
+			public:
+				enum { value = std::is_same(test<ClassType>(0), std::true_type) };
+			};*/
+			
+			template <typename ClassType, typename std::enable_if<has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
 			static void gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func);
+			
+			template <typename ClassType, typename std::enable_if<!has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
+			static void gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func)
+			{
+			}
 			
 			template <typename ClassType, value(ClassType::*Func)(const args&)>
 			static JSValue invoke_member(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
@@ -670,7 +695,7 @@ namespace quickjs
 		}
 		
 	public:
-		typedef std::function<void(const value& val)> mark_func;
+		typedef std::function<void(JSValue val)> mark_func;
 		
 		value()
 		{
@@ -2067,7 +2092,7 @@ namespace quickjs
 			}
 		}
 		
-		template <typename ClassType>
+		template <typename ClassType, typename std::enable_if<classes::has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
 		inline void classes::gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func)
 		{
 			// raw may be nullptr if the instantiation failed, e.g. an exception was thrown
@@ -2075,10 +2100,9 @@ namespace quickjs
 			{
 				QJSCPP_DEBUG("Mark class @ " << (void*)raw_to_inst_ptr(raw));
 				raw_to_inst(raw)->gc_mark(
-					[&](const value& val)
+					[&](JSValue val)
 					{
-						if (val.valid())
-							JS_MarkValue(rt, val.val_, mark_func);
+						JS_MarkValue(rt, val, mark_func);
 					});
 			}
 		}
