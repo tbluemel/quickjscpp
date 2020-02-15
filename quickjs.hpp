@@ -590,17 +590,6 @@ namespace quickjs
 			
 			template <typename C>
 			struct has_gc_mark<C, void_t<decltype(&C::gc_mark)>>: std::is_same<void, decltype(std::declval<C>().gc_mark(nullptr))>{};
-			/*
-			template <typename ClassType>
-			class has_gc_mark
-			{
-				template <typename C>
-				static std::true_type test(decltype(&C::gc_mark));
-				template <typename C>
-				static std::false_type test(...);
-			public:
-				enum { value = std::is_same(test<ClassType>(0), std::true_type) };
-			};*/
 			
 			template <typename ClassType, typename std::enable_if<has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
 			static void gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func);
