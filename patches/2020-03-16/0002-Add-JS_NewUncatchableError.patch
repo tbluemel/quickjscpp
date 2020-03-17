@@ -1,0 +1,46 @@
+From 0f3880878077ef745caad2c325e94233034a27d9 Mon Sep 17 00:00:00 2001
+From: Thomas Bluemel <thomas@reactsoft.com>
+Date: Mon, 3 Feb 2020 21:52:30 -0700
+Subject: [PATCH 2/2] Add JS_NewUncatchableError()
+
+This function allows throwing an error that javascript cannot catch.
+---
+ quickjs.c | 9 +++++++++
+ quickjs.h | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/quickjs.c b/quickjs.c
+index 0cf2424..3e9d524 100644
+--- a/quickjs.c
++++ b/quickjs.c
+@@ -9423,6 +9423,15 @@ void JS_ResetUncatchableError(JSContext *ctx)
+     JS_SetUncatchableError(ctx, ctx->current_exception, FALSE);
+ }
+ 
++JSValue JS_NewUncatchableError(JSContext *ctx)
++{
++    JSValue obj;
++
++    obj = JS_NewError(ctx);
++    JS_SetUncatchableError(ctx, obj, TRUE);
++    return obj;
++}
++
+ void JS_SetOpaque(JSValue obj, void *opaque)
+ {
+    JSObject *p;
+diff --git a/quickjs.h b/quickjs.h
+index e042a3b..8fcdd4e 100644
+--- a/quickjs.h
++++ b/quickjs.h
+@@ -626,6 +626,7 @@ JSValue JS_GetException(JSContext *ctx);
+ JS_BOOL JS_IsError(JSContext *ctx, JSValueConst val);
+ void JS_ResetUncatchableError(JSContext *ctx);
+ JSValue JS_NewError(JSContext *ctx);
++JSValue JS_NewUncatchableError(JSContext *ctx);
+ JSValue __js_printf_like(2, 3) JS_ThrowSyntaxError(JSContext *ctx, const char *fmt, ...);
+ JSValue __js_printf_like(2, 3) JS_ThrowTypeError(JSContext *ctx, const char *fmt, ...);
+ JSValue __js_printf_like(2, 3) JS_ThrowReferenceError(JSContext *ctx, const char *fmt, ...);
+-- 
+2.20.1
+
