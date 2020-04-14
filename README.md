@@ -4,9 +4,9 @@ quickjscpp is a header-only wrapper around the [quickjs](https://bellard.org/qui
 
 This wrapper also automatically tracks the lifetime of values and objects, is exception-safe, and automates clean-up.
 
-Supported [quickjs](https://bellard.org/quickjs/) version: [2020-01-19](https://bellard.org/quickjs/quickjs-2020-01-19.tar.xz) (plus patches)
+Supported [quickjs](https://bellard.org/quickjs/) version: [2020-04-12](https://bellard.org/quickjs/quickjs-2020-04-12.tar.xz) (plus patches)
 
-You will need to apply the [3 patches](patches) for features not (yet) present in the upstream [quickjs](https://bellard.org/quickjs/) project.
+You will need to apply the [2 patches](patches) for features not (yet) present in the upstream [quickjs](https://bellard.org/quickjs/) project.
 
 # Example
 ```cpp
