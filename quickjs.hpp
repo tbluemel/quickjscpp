@@ -30,6 +30,7 @@
 #include <cstring>
 #include <cassert>
 #include <map>
+#include <string>
 #include <vector>
 #include <exception>
 #include <functional>
