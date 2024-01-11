@@ -529,25 +529,25 @@ namespace quickjs
 		
 		struct classes
 		{
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static ClassType* get_raw_inst(JSValueConst val);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static std::shared_ptr<ClassType>* get_raw_inst(JSValueConst val);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static ClassType* get_inst(JSValueConst val);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static std::shared_ptr<ClassType> get_inst(JSValueConst val);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>{}, int>::type = 0>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>{}, int>::type>
 			static JSValue class_make_object_for_inst(JSContext* ctx, const std::shared_ptr<ClassType>& inst);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>{}, int>::type = 0>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>{}, int>::type>
 			static JSValue class_make_inst(JSContext* ctx, JSValueConst new_target, int argc, JSValueConst *argv);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>{}, int>::type = 0>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>{}, int>::type>
 			static JSValue class_make_inst(JSContext* ctx, JSValueConst new_target, int argc, JSValueConst *argv);
 			
 			template <typename ClassType>
@@ -574,10 +574,10 @@ namespace quickjs
 				return *raw_ptr;
 			}
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static void finalizer(JSRuntime *rt, JSValue val);
 			
-			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<std::is_base_of<class_def_shared<ClassType>, decltype(ClassType::class_definition)>::value>::type*>
 			static void finalizer(JSRuntime *rt, JSValue val);
 			
 			template <typename ClassType>
@@ -592,7 +592,7 @@ namespace quickjs
 			template <typename C>
 			struct has_gc_mark<C, void_t<decltype(&C::gc_mark)>>: std::is_same<void, decltype(std::declval<C>().gc_mark(nullptr))>{};
 			
-			template <typename ClassType, typename std::enable_if<has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
+			template <typename ClassType, typename std::enable_if<has_gc_mark<ClassType>::value, ClassType>::type*>
 			static void gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func);
 			
 			template <typename ClassType, typename std::enable_if<!has_gc_mark<ClassType>::value, ClassType>::type* = nullptr>
@@ -2282,15 +2282,13 @@ namespace quickjs
 			return call_common(func, ctx, thisObj, std::forward<A>(a));
 		}
 		
-		template <typename A1, typename A2, typename... Args,
-			typename = typename std::enable_if<!is_iterator_args<A1, A2>::value>::type>
+		template <typename A1, typename A2, typename... Args, typename>
 		inline value functions::call(const value& func, JSContext* ctx, const value& thisObj, A1&& a1, A2&& a2, Args&&... a)
 		{
 			return call_common(func, ctx, thisObj, std::forward<A1>(a1), std::forward<A2>(a2), std::forward<Args>(a)...);
 		}
 
-		template <typename Begin, typename End,
-			typename = typename std::enable_if<is_iterator_args<Begin, End>::value>::type>
+		template <typename Begin, typename End, typename>
 		inline value functions::call(const value& func, JSContext* ctx, const value& thisObj, Begin&& begin, End&& end)
 		{
 			return call_common_it(func, ctx, thisObj, std::forward<Begin>(begin), std::forward<End>(end));
